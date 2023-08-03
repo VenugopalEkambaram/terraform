@@ -2,39 +2,6 @@ provider "aws"{
     region = "us-east-2"    
 }
 
-# resource "aws_instance" "venu" {
-#         ami = "ami-0fb653ca2d3203ac1"
-#         instance_type = "t2.micro"
-#         vpc_security_group_ids = [aws_security_group.awssecuritygroup.id]
-
-#         user_data = <<-EOF
-#                     #!/bin/bash
-#                     echo "Hello, World" > index.html
-#                     nohup busybox httpd -f -p ${var.server_port} &
-#                     EOF
-
-#         user_data_replace_on_change = true
-        
-#         tags = {
-#             Name = "terraform-example"
-#         }
-#     }
-
-variable "server_port" {
-    description = "The port the server will use for HTTP requests"
-    type = number
-    default = 8081
-}
-resource "aws_security_group" "awssecuritygroup" {
-  name = "tf-exmaple-instance"
-
-  ingress {
-    from_port = var.server_port
-    to_port = var.server_port
-    protocol = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-}
 
 # output "public_ip" {
 #     value = aws_instance.venu.public_ip
@@ -46,7 +13,7 @@ output "alb_dns_name" {
     description = "The domain name of the load balancer"
 }
 
-// Creates Launch configuration (Dreprecated)
+// Creates Launch configuration (Deprecated)
 # resource "aws_launch_configuration" "example" {
 #     image_id = "ami-0fb653ca2d3203ac1"
 #     instance_type = "t2.micro"
@@ -68,14 +35,14 @@ resource "aws_launch_template" "example" {
   image_id = "ami-0fb653ca2d3203ac1"
   instance_type = "t2.micro"
   //security_group_names = [aws_security_group.awssecuritygroup.example]
-
-  //security_groups = [aws_security_group.awssecuritygroup.id]
-
-    user_data = <<-EOF
+  vpc_security_group_ids = [aws_security_group.awssecuritygroup.id]
+    
+    user_data = base64encode(<<-EOF
                     #!/bin/bash
                     echo "Hello, World" > index.html
                     nohup busybox httpd -f -p ${var.server_port} &
                     EOF   
+                    )
   
   lifecycle {
     create_before_destroy = true
@@ -129,24 +96,6 @@ resource "aws_lb_listener" "http" {
   }
 }
 
-resource "aws_security_group" "myalb" {
-  name = "terraform-example-alb"
-  # Allow inbound HTTP requests
-  ingress {
-    from_port   = 80
-    to_port     = 80
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-
-  # Allow all outbound requests
-  egress {
-    from_port   = 0
-    to_port     = 0
-    protocol    = "-1"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-}
 
 resource "aws_lb_target_group" "asg" {
   name = "terraform-asg-example"
