@@ -1,3 +1,4 @@
+```
 terraform/
   ├── aws/
   │   ├── main.tf
@@ -19,7 +20,7 @@ terraform/
   │   └── ...
   ├── variables.tf
   └── terraform.tfvars
-
+```
 
 In the above directory structure, you have separate directories for AWS and Azure configurations, along with a modules directory for any shared modules that can be used across both providers. The variables.tf file defines common variables used in both AWS and Azure configurations, and the terraform.tfvars file contains variable values specific to your project.
 
